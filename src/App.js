@@ -11,7 +11,6 @@ function App() {
   const [lobbies, setLobbies] = useState([]);
   const [opponent, setOpponent] = useState('');
 
-  // Benachrichtigungen empfangen
   useEffect(() => {
     socket.on('lobby-update', (lobby) => {
       console.log(lobby);
@@ -21,7 +20,6 @@ function App() {
     });
   }, []);
 
-  // Funktion zum Erstellen einer Lobby
   const createLobby = async () => {
     if(user){    
       const response = await axios.post('http://localhost:3001/lobbies', { user });
@@ -31,14 +29,12 @@ function App() {
     }    
   };
 
-  // Funktion zum Suchen verfügbarer Lobbies
   const findLobbies = async () => {
 
     const response = await axios.get('http://localhost:3001/lobbies');
     setLobbies(response.data);
   };
 
-  // Funktion zum Beitreten einer Lobby
   const joinLobby = async (lobby) => {
     if(user){
       await axios.put(`http://localhost:3001/lobbies/${lobby._id}`, { user });
