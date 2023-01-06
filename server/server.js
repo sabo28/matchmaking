@@ -6,13 +6,11 @@ const { Server } = require("socket.io");
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Verbinde dich mit der Datenbank
 mongoose.connect('mongodb://localhost:27017/mydatabase', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
 
-// Model für Lobby-Dokumente
 const Lobby = mongoose.model('Lobby', new mongoose.Schema({
   user1: {
     type: String,
@@ -24,7 +22,6 @@ const Lobby = mongoose.model('Lobby', new mongoose.Schema({
   }
 }));
 
-// Websocket-Server
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -32,35 +29,28 @@ const io = new Server(server, {
   }
 });
 
-// Websocket-Verbindungen speichern
 const connections = new Map();
 
 io.on('connection', (socket) => {
-  // Verbindungs-ID generieren und speichern
   const id = Math.random().toString(36).substr(2);
   connections.set(id, socket);
 
-  // Verbindung trennen
   socket.on('disconnect', () => {
     connections.delete(id);
   });
 });
 
-// Benachrichtigungen senden
 const sendNotification = (lobby) => {
   if (lobby.user2) {
-    // Benachrichtigung an beiden Benutzer senden
     connections.forEach((socket) => {
       socket.emit('lobby-update', lobby);
     });
   }
 };
 
-// Parsing middleware
 app.use(express.json());
 app.use(cors());
 
-// Route zum Erstellen einer Lobby
 app.post('/lobbies', async (req, res) => {
   const { user } = req.body;
   const lobby = new Lobby({ user1: user });
@@ -68,15 +58,12 @@ app.post('/lobbies', async (req, res) => {
   res.send(lobby._id);
 });
 
-// Route zum Suchen verfügbarer Lobbies
 app.get('/lobbies', async (req, res) => {
   const lobbies = await Lobby.find({ user2: { $exists: false } });
   res.send(lobbies);
 });
 
-// Route zum Beitreten einer Lobby
 app.put('/lobbies/:id', async (req, res) => {
-  // Beginne Transaktion
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -95,7 +82,6 @@ app.put('/lobbies/:id', async (req, res) => {
   }
 });
 
-// Server starten
 server.listen(3001, () => {
   console.log('Listening on port 3001');
 });
