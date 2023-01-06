@@ -49,16 +49,9 @@ io.on('connection', (socket) => {
 // Benachrichtigungen senden
 const sendNotification = (lobby) => {
   if (lobby.user2) {
-    // Benachrichtigung an beide Benutzer senden
+    // Benachrichtigung an beiden Benutzer senden
     connections.forEach((socket) => {
       socket.emit('lobby-update', lobby);
-    });
-  } else {
-    // Benachrichtigung nur an Benutzer 1 senden
-    connections.forEach((socket) => {
-      if (socket.user === lobby.user1) {
-        socket.emit('lobby-update', lobby);
-      }
     });
   }
 };
@@ -72,7 +65,6 @@ app.post('/lobbies', async (req, res) => {
   const { user } = req.body;
   const lobby = new Lobby({ user1: user });
   await lobby.save();
-  sendNotification(lobby);
   res.send(lobby._id);
 });
 

@@ -17,11 +17,7 @@ function App() {
       console.log(lobby);
       if(lobby.user2){
         setOpponent(lobby.user2);
-        console.log('done');
-      }else {
-        console.log('not done');
       }
-      console.log(`Lobby update: ${lobby.user1} + ${lobby.user2}`);
     });
   }, []);
 
